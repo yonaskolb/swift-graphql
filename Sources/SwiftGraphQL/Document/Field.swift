@@ -52,7 +52,9 @@ public enum GraphQLField {
         switch self {
         case let .leaf(name, parent, arguments),
             let .composite(name, parent, _, arguments, _):
-            return "\(name.camelCasePreservingSurroundingUnderscores)\(parent.camelCasePreservingSurroundingUnderscores)_\(arguments.hash)"
+            // using aliases that are different from the actual name breaks edges in our graph, disabling for now
+            // return "\(name.camelCasePreservingSurroundingUnderscores)\(parent.camelCasePreservingSurroundingUnderscores)_\(arguments.hash)"
+            return name
         case .fragment:
             return nil
         }
