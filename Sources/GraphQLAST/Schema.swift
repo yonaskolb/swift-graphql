@@ -4,7 +4,7 @@ import Foundation
 
 public struct Schema: Decodable, Equatable {
     /// Collection of all types in the schema.
-    public let types: [NamedType]
+    public var types: [NamedType]
 
     private let _query: String
     private let _mutation: String?

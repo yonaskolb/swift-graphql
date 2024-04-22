@@ -49,7 +49,7 @@ public struct ObjectType: NamedTypeProtocol, Decodable, Equatable {
     public let name: String
     public let description: String?
 
-    public let fields: [Field]
+    public var fields: [Field]
     public let interfaces: [InterfaceTypeRef]?
     
 }
@@ -139,7 +139,7 @@ public struct InputObjectType: NamedTypeProtocol, Decodable, Equatable {
     public let name: String
     public let description: String?
 
-    public let inputFields: [InputValue]
+    public var inputFields: [InputValue]
 }
 
 extension InputObjectType {

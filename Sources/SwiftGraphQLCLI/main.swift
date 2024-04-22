@@ -96,9 +96,52 @@ struct SwiftGraphQLCLI: ParsableCommand {
         // Fetch the schema.
         let loadSchemaSpinner = Spinner(.dots, "Fetching GraphQL Schema")
         loadSchemaSpinner.start()
-        let schema: Schema
+        var schema: Schema
         do {
             schema = try Schema(from: url, withHeaders: headers)
+            schema.types = schema.types.filter { type in
+                switch type {
+//                case .inputObject(let input):
+//                    return !input.name.contains("WhereInput")
+                default:
+                    return !type.name.lowercased().contains("admin")
+                }
+            }
+            schema.types = schema.types.map { type in
+                switch type {
+                case .object(let object):
+                    if object.name == "Mutation" || object.name == "Query" {
+                        let previousCount = object.fields.count
+                        var object = object
+                        object.fields = object.fields.filter { 
+                            !(
+                                $0.name.lowercased().contains("admin") ||
+                                ($0.description?.lowercased().contains("admin only") ?? false)
+                            )
+                        }
+//                        object.fields = object.fields.map { field in
+//                            var field = field
+//                            field.args = field.args.filter {
+//                                switch $0.type.namedType {
+//                                case .inputObject(let name):
+//                                    return !name.contains("WhereInput")
+//                                default:
+//                                    return true
+//                                }
+//                            }
+//                            return field
+//                        }
+                        print("Removed \(previousCount - object.fields.count) of \(previousCount) fields from \(object.name)")
+                        return .object(object)
+                    }
+                    return type
+//                case .inputObject(let object):
+//                    var object = object
+////                    object.inputFields = []
+//                    return .inputObject(object)
+                default: return type
+                }
+            }
         } catch(let err) {
             print(err.localizedDescription)
             SwiftGraphQLCLI.exit(withError: .unreachable)

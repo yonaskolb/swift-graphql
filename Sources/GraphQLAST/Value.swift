@@ -4,7 +4,7 @@ import Foundation
 public struct Field: Decodable, Equatable {
     public let name: String
     public let description: String?
-    public let args: [InputValue]
+    public var args: [InputValue]
     public let type: OutputTypeRef
     public let isDeprecated: Bool
     public let deprecationReason: String?
