@@ -45,9 +45,12 @@ public struct Argument: Hashable {
         self.name = name
         self.type = type
 
+        // don't use a hashed alias, just use the name instead
+        self.hash = name
+        
         // Argument hash identifier.
-        let hashableValue = HashableValue(value: value, type: type)
-        self.hash = "_\(hashableValue.hashValue.hash)"
+        //let hashableValue = HashableValue(value: value, type: type)
+        //self.hash = "_\(hashableValue.hashValue.hash)"
 
         /* Encode value */
         if let value = value as? OptionalArgumentProtocol, !value.hasValue {
