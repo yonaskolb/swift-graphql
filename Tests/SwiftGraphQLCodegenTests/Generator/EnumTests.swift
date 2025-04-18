@@ -38,7 +38,7 @@ final class EnumTests: XCTestCase {
             ]
         )
 
-        let generated = try type.declaration.format()
+        let generated = try type.declaration().format()
 
         generated.assertInlineSnapshot(matching: """
            extension Enums {
@@ -65,6 +65,115 @@ final class EnumTests: XCTestCase {
                    self = value
                  } else {
                    throw ScalarDecodingError.unknownEnumCase(value: string)
+                 }
+               default:
+                 throw ScalarDecodingError.unexpectedScalarType(
+                   expected: "Episodes",
+                   received: data.value
+                 )
+               }
+             }
+           
+             public static var mockValue = Self.newhope
+           }
+           """)
+    }
+
+    func testFallbackCase() throws {
+
+        let type = EnumType(
+            name: "Episodes",
+            description: "Collection of all StarWars episodes.\nEarliest trilogy.",
+            enumValues: [
+                EnumValue(
+                    name: "NEWHOPE",
+                    description: "Released in 1977.",
+                    isDeprecated: false,
+                    deprecationReason: nil
+                ),
+            ]
+        )
+
+        let generated = try type.declaration(fallbackCase: "unknown").format()
+
+        generated.assertInlineSnapshot(matching: """
+           extension Enums {
+             /// Collection of all StarWars episodes.
+             /// Earliest trilogy.
+             public enum Episodes: String, CaseIterable, Codable {
+               /// Released in 1977.
+               case newhope = "NEWHOPE"
+           
+               /// Fallback in case decoding fails.
+               case unknown = "unknown"
+             }
+           }
+           
+           extension Enums.Episodes: GraphQLScalar {
+             public init(from data: AnyCodable) throws {
+               switch data.value {
+               case let string as String:
+                 if let value = Enums.Episodes(rawValue: string) {
+                   self = value
+                 } else {
+                   self = .unknown
+                 }
+               default:
+                 throw ScalarDecodingError.unexpectedScalarType(
+                   expected: "Episodes",
+                   received: data.value
+                 )
+               }
+             }
+           
+             public static var mockValue = Self.newhope
+           }
+           """)
+    }
+
+    func testMatchingFallbackCase() throws {
+
+        let type = EnumType(
+            name: "Episodes",
+            description: "Collection of all StarWars episodes.\nEarliest trilogy.",
+            enumValues: [
+                EnumValue(
+                    name: "NEWHOPE",
+                    description: "Released in 1977.",
+                    isDeprecated: false,
+                    deprecationReason: nil
+                ),
+                EnumValue(
+                    name: "unknown",
+                    description: "An unknown episode",
+                    isDeprecated: false,
+                    deprecationReason: nil
+                ),
+            ]
+        )
+
+        let generated = try type.declaration(fallbackCase: "unknown").format()
+
+        generated.assertInlineSnapshot(matching: """
+           extension Enums {
+             /// Collection of all StarWars episodes.
+             /// Earliest trilogy.
+             public enum Episodes: String, CaseIterable, Codable {
+               /// Released in 1977.
+               case newhope = "NEWHOPE"
+               /// An unknown episode
+               case unknown = "unknown"
+             }
+           }
+           
+           extension Enums.Episodes: GraphQLScalar {
+             public init(from data: AnyCodable) throws {
+               switch data.value {
+               case let string as String:
+                 if let value = Enums.Episodes(rawValue: string) {
+                   self = value
+                 } else {
+                   self = .unknown
                  }
                default:
                  throw ScalarDecodingError.unexpectedScalarType(

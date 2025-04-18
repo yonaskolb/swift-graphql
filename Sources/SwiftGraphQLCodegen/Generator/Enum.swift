@@ -5,17 +5,17 @@ import SwiftGraphQLUtils
 extension EnumType {
     
     /// Represents the enum structure.
-    var declaration: String {
+    func declaration(fallbackCase: String? = nil) -> String {
         """
         extension Enums {
             \(docs)
             public enum \(name.pascalCase): String, CaseIterable, Codable {
-            \(values)
+            \(values(fallbackCase: fallbackCase))
             }
         }
         
         extension Enums.\(name.pascalCase): GraphQLScalar {
-            \(decode)
+            \(decode(fallbackCase: fallbackCase))
         
             \(mock)
         }
@@ -29,13 +29,24 @@ extension EnumType {
     }
 
     /// Represents possible enum cases.
-    private var values: String {
-        enumValues.map { $0.declaration }.joined(separator: "\n")
+    private func values(fallbackCase: String?) -> String {
+        var cases = enumValues.map { $0.declaration }
+        if let fallbackCase, !enumValues.contains(where: { $0.name == fallbackCase }) {
+            let fallbackEnumValue = EnumValue(
+                name: fallbackCase,
+                description: "Fallback in case decoding fails.",
+                isDeprecated: false,
+                deprecationReason: nil
+            )
+            cases.append("")
+            cases.append(fallbackEnumValue.declaration)
+        }
+        return cases.joined(separator: "\n")
     }
     
     // MARK: - GraphQL Scalar
     
-    private var decode: String {
+    private func decode(fallbackCase: String?) -> String {
         return """
             public init(from data: AnyCodable) throws {
                 switch data.value {
@@ -43,7 +54,7 @@ extension EnumType {
                     if let value = Enums.\(self.name.pascalCase)(rawValue: string) {
                         self = value
                     } else {
-                        throw ScalarDecodingError.unknownEnumCase(value: string)
+                        \(fallbackCase != nil ? "self = .\(fallbackCase!.camelCasePreservingSurroundingUnderscores.normalize)" : "throw ScalarDecodingError.unknownEnumCase(value: string)")
                     }
                 default:
                     throw ScalarDecodingError.unexpectedScalarType(
