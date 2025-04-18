@@ -122,7 +122,8 @@ struct SwiftGraphQLCLI: ParsableCommand {
             files = try generator.generate(
                 schema: schema,
                 generateStaticFields: config.generateStaticFields != false,
-                singleFile: singleFileOutput
+                singleFile: singleFileOutput,
+                enumFallbackCase: config.enumFallbackCase
             )
             generateCodeSpinner.success("API generated successfully!")
         } catch CodegenError.formatting(let err) {
@@ -196,6 +197,9 @@ struct Config: Codable, Equatable {
 
     /// Whether to generate static lookups for object fields
     var generateStaticFields: Bool?
+
+    /// An extra fallback case for all enums if decoding fails. "unknown": is a recommended value. If the case already exists in the enum it will use that, otherwise generate a new case
+    var enumFallbackCase: String?
 
     // MARK: - Initializers
 

@@ -21,7 +21,7 @@ public struct GraphQLCodegen {
     ///   - generateStaticFields: Whether to generate static selections for fields on objects
     ///   - singleFile: Whether to return all the swift code in a single file
     /// - Returns: A list of generated files
-    public func generate(schema: Schema, generateStaticFields: Bool, singleFile: Bool = false) throws -> [GeneratedFile] {
+    public func generate(schema: Schema, generateStaticFields: Bool, singleFile: Bool = false, enumFallbackCase: String? = nil) throws -> [GeneratedFile] {
         let context = Context(schema: schema, scalars: self.scalars)
         
         let subscription = schema.operations.first { $0.isSubscription }?.type.name
@@ -87,7 +87,7 @@ public struct GraphQLCodegen {
         }
 
         for enumSchema in schema.enums {
-            try addFile(name: "Enums/\(enumSchema.name)", contents: enumSchema.declaration)
+            try addFile(name: "Enums/\(enumSchema.name)", contents: enumSchema.declaration(fallbackCase: enumFallbackCase))
         }
 
         for interface in schema.interfaces {
