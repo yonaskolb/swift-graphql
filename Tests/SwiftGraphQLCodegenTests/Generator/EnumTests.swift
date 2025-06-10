@@ -38,7 +38,7 @@ final class EnumTests: XCTestCase {
             ]
         )
 
-        let generated = try type.declaration.format()
+        let generated = try type.declaration(fallbackCase: nil).format()
 
         generated.assertInlineSnapshot(matching: """
            extension Enums {
