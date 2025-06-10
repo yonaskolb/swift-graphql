@@ -8,7 +8,7 @@ final class HTTPTests: XCTestCase {
     func testHTTPQuery() throws {
         let expectation = expectation(description: "received response")
         
-        let query = Selection.Query<String> {
+        let query = Selection.Query {
             try $0.hello()
         }
         

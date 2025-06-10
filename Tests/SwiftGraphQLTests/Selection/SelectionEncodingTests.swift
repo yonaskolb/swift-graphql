@@ -6,7 +6,7 @@ import XCTest
 final class SelectionEncodingTests: XCTestCase {
     
     func testValidatingSelection() throws {
-        let character = Selection.Character<String> {
+        let character = Selection.Character {
             let id = try $0.id()
             let name = try $0.name()
             
@@ -17,7 +17,7 @@ final class SelectionEncodingTests: XCTestCase {
             return name
         }
         
-        let selection = Selection.Query<[String]> {
+        let selection = Selection.Query {
             try $0.characters(selection: character.list)
         }
         

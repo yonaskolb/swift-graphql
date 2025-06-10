@@ -58,13 +58,13 @@ final class AsyncInterfaceTests: XCTestCase {
     }
 
     func testAsyncSelectionMutationReturnsValue() async throws {
-        let selection = Selection.AuthPayload<String?> {
+        let selection = Selection.AuthPayload {
             try $0.on(
-                authPayloadSuccess: Selection.AuthPayloadSuccess<String?> {
+                authPayloadSuccess: Selection.AuthPayloadSuccess {
                     try $0.token()
                 },
-                authPayloadFailure: Selection.AuthPayloadFailure<String?> { _ in
-                    nil
+                authPayloadFailure: Selection.AuthPayloadFailure { _ in
+                    nil as String?
                 }
             )
         }
@@ -98,13 +98,13 @@ final class AsyncInterfaceTests: XCTestCase {
     }
 
     func testAsyncSelectionMutationThrowsError() async throws {
-        let selection = Selection.AuthPayload<String?> {
+        let selection = Selection.AuthPayload {
             try $0.on(
-                authPayloadSuccess: Selection.AuthPayloadSuccess<String?> {
+                authPayloadSuccess: Selection.AuthPayloadSuccess {
                     try $0.token()
                 },
-                authPayloadFailure: Selection.AuthPayloadFailure<String?> { _ in
-                    nil
+                authPayloadFailure: Selection.AuthPayloadFailure { _ in
+                    nil as String?
                 }
             )
         }
